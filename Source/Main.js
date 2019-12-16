@@ -3,12 +3,13 @@ import Display from "./Display.js";
 import Controller from "./Controller.js";
 import Engine from "./Engine.js";
 
+/*
+Load the files before starting the game
+*/
 window.addEventListener("load", function(event) {
 
   "use strict";
-
-  //// CONSTANTS ////
-
+  //Json file of the game
   const ZONE_PREFIX = "Source/zone";
   const ZONE_SUFFIX = ".json";
 
@@ -16,6 +17,10 @@ window.addEventListener("load", function(event) {
     //// CLASSES ////
   /////////////////
 
+
+  /*
+  Is in charged of loading game assets 
+  */
   const AssetsManager = function() {
 
     this.tile_set_image = undefined;
@@ -24,23 +29,28 @@ window.addEventListener("load", function(event) {
 
   AssetsManager.prototype = {
 
-    constructor: Game.AssetsManager,
+    constructor: AssetsManager,
+
 
     requestJSON:function(url, callback) {
-
+      
+      //XMLHttpRequest is a request when trying to transfer files
       let request = new XMLHttpRequest();
 
+      //Will wait until files are loaded
       request.addEventListener("load", function(event) {
-
+        
         callback(JSON.parse(this.responseText));
 
       }, { once:true });
 
+      //Get method url
       request.open("GET", url);
       request.send();
 
     },
 
+    //same as top but loads image
     requestImage:function(url, callback) {
 
       let image = new Image();
@@ -60,13 +70,15 @@ window.addEventListener("load", function(event) {
       ///////////////////
     //// FUNCTIONS ////
   ///////////////////
-
+  
+  //calls the controller keydownup and passes in event type and code
   var keyDownUp = function(event) {
 
     controller.keyDownUp(event.type, event.keyCode);
 
   };
 
+  //jsut resizes the canvas to fit game world
   var resize = function(event) {
 
     display.resize(document.documentElement.clientWidth, document.documentElement.clientHeight, game.world.height / game.world.width);
@@ -80,10 +92,12 @@ window.addEventListener("load", function(event) {
 
   };
 
+  //very important as it is part of the engine
   var render = function() {
 
-    var frame = undefined;
 
+    var frame = undefined;
+    
     display.drawMap   (assets_manager.tile_set_image,
     game.world.tile_set.columns, game.world.graphical_map, game.world.columns,  game.world.tile_set.tile_size);
 
