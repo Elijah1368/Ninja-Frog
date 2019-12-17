@@ -3,30 +3,30 @@ const Collider = function() {
 
   /* I changed this so all the checks happen in y first order. */
   this.collide = function(value, object, tile_x, tile_y, tile_size) {
-
+   
     switch(value) {
 
-      case  1:     this.collidePlatformTop    (object, tile_y            ); break;
-      case  2:     this.collidePlatformRight  (object, tile_x + tile_size); break;
-      case  3: if (this.collidePlatformTop    (object, tile_y            )) return;
+      case  34:     this.collidePlatformTop    (object, tile_y            ); break;
+      case  54:     this.collidePlatformRight  (object, tile_x + tile_size); break;
+      case  35: if (this.collidePlatformTop    (object, tile_y            )) return;
                    this.collidePlatformRight  (object, tile_x + tile_size); break;
-      case  4:     this.collidePlatformBottom (object, tile_y + tile_size); break;
+      case  72:     this.collidePlatformBottom (object, tile_y + tile_size); break;
       case  5: if (this.collidePlatformTop    (object, tile_y            )) return;
                    this.collidePlatformBottom (object, tile_y + tile_size); break;
-      case  6: if (this.collidePlatformRight  (object, tile_x + tile_size)) return;
+      case  73: if (this.collidePlatformRight  (object, tile_x + tile_size)) return;
                    this.collidePlatformBottom (object, tile_y + tile_size); break;
       case  7: if (this.collidePlatformTop    (object, tile_y            )) return;
                if (this.collidePlatformBottom (object, tile_y + tile_size)) return;
                    this.collidePlatformRight  (object, tile_x + tile_size); break;
-      case  8:     this.collidePlatformLeft   (object, tile_x            ); break;
-      case  9: if (this.collidePlatformTop    (object, tile_y            )) return;
+      case  52:     this.collidePlatformLeft   (object, tile_x            ); break;
+      case  33: if (this.collidePlatformTop    (object, tile_y            )) return;
                    this.collidePlatformLeft   (object, tile_x            ); break;
       case 10: if (this.collidePlatformLeft   (object, tile_x            )) return;
                    this.collidePlatformRight  (object, tile_x + tile_size); break;
       case 11: if (this.collidePlatformTop    (object, tile_y            )) return;
                if (this.collidePlatformLeft   (object, tile_x            )) return;
                    this.collidePlatformRight  (object, tile_x + tile_size); break;
-      case 12: if (this.collidePlatformBottom (object, tile_y + tile_size)) return;
+      case 71: if (this.collidePlatformBottom (object, tile_y + tile_size)) return;
                    this.collidePlatformLeft   (object, tile_x            ); break;
       case 13: if (this.collidePlatformTop    (object, tile_y            )) return;
                if (this.collidePlatformBottom (object, tile_y + tile_size)) return;
@@ -52,7 +52,6 @@ Collider.prototype = {
   collidePlatformBottom:function(object, tile_bottom) {
 
     if (object.getTop() < tile_bottom && object.getOldTop() >= tile_bottom) {
-
       object.setTop(tile_bottom);
       object.velocity_y = 0;
       return true;
@@ -67,6 +66,11 @@ Collider.prototype = {
 
       object.setRight(tile_left - 0.01);
       object.velocity_x = 0;
+      if (object.hasOwnProperty('isGrounded') && object.isGrounded == false) {
+        object.jumpCount = 1;
+        object.wallClimbing = true;
+      } 
+
       return true;
 
     } return false;
@@ -79,6 +83,10 @@ Collider.prototype = {
 
       object.setLeft(tile_right);
       object.velocity_x = 0;
+      if (object.hasOwnProperty('isGrounded') && object.isGrounded == false) {
+        object.jumpCount = 1;
+        object.wallClimbing = true;
+      } 
       return true;
 
     } return false;
@@ -91,7 +99,11 @@ Collider.prototype = {
 
       object.setBottom(tile_top - 0.01);
       object.velocity_y = 0;
-      object.jumping    = false;
+      if (object.hasOwnProperty('jumpCount')) {
+        object.wallClimbing = false;
+        object.jumpCount = 0;
+        object.isGrounded = true;
+      } 
       return true;
 
     } return false;

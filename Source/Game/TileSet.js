@@ -6,16 +6,46 @@ const TileSet = function(columns, tile_size) {
 
   let f = Frame;
 
-  this.frames = [new f(115,  96, 13, 16, 0, -4), // idle-left
-                 new f( 50,  96, 13, 16, 0, -4), // jump-left
-                 new f(102,  96, 13, 16, 0, -4), new f(89, 96, 13, 16, 0, -4), new f(76, 96, 13, 16, 0, -4), new f(63, 96, 13, 16, 0, -4), // walk-left
-                 new f(  0, 112, 13, 16, 0, -4), // idle-right
-                 new f( 65, 112, 13, 16, 0, -4), // jump-right
-                 new f( 13, 112, 13, 16, 0, -4), new f(26, 112, 13, 16, 0, -4), new f(39, 112, 13, 16, 0, -4), new f(52, 112, 13, 16, 0, -4), // walk-right
-                 new f( 81, 112, 14, 16), new f(96, 112, 16, 16), // carrot
-                 new f(112, 115, 16,  4), new f(112, 124, 16, 4), new f(112, 119, 16, 4) // grass
-                ];
+  this.frames = [];
+  //idle left
+  let offset = -7;
+  for (let i = 1; i <= 11; i++){
+    this.frames.push(new f(32 * i, 64, 32, 32, 0, offset));
+  } 
+  //idle right 
+  for (let i = 1; i <= 11; i++){
+    this.frames.push(new f(32 * i, 32, 32, 32, 0, offset));
+  }
+  //walk right
+  for (let i = 1; i <= 12; i++){
+    this.frames.push(new f(32 * i, 96, 32, 32, 0, offset));
+  } 
+  //walk left
+  for (let i = 1; i <= 12; i++){
+    this.frames.push(new f(32 * i, 128, 32, 32, 0, offset));
+  } 
 
+  this.frames.push(new f(32, 32 * 6, 32, 32, 0, offset));
+  this.frames.push(new f(64, 32 * 6, 32, 32, 0, offset));
+
+  //djump right
+  for (let i = 1; i <= 6; i++){
+    this.frames.push(new f(32 * i, 32 * 9, 32, 32, 0, offset));
+  } 
+
+  //djump left
+  for (let i = 1; i <= 6; i++){
+    this.frames.push(new f(32 * i, 32 * 10, 32, 32, 0, offset));
+  } 
+
+  //wallclimbright
+  for (let i = 1; i <= 5; i++){
+    this.frames.push(new f(32 * i, 32 * 5, 32, 32, 0, offset));
+  } 
+  //wallclimbleft
+  for (let i = 1; i <= 5; i++){
+    this.frames.push(new f(32 * i + 160, 32 * 5, 32, 32, 0, offset));
+  } 
 };
 TileSet.prototype = { constructor: TileSet };
 export default TileSet;

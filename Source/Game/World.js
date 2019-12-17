@@ -1,25 +1,22 @@
-import Animator from "./Animator.js";
+
 import Collider from "./Collider.js";
-import Frame from "./Frame.js";
-import Matter from "./Matter.js";
-import Carrot from "./Carrot.js";
-import Door from "./Door.js";
-import Grass from "./Grass.js";
-import MovingObject from "./MovingObject.js";
 import Player from "./Player.js";
 import TileSet from "./TileSet.js";
 
-const World = function(friction = 0.85, gravity = 2) {
+const World = function(friction = 0.4, gravity = 2) {
 
   this.collider     = new Collider();
 
   this.friction     = friction;
   this.gravity      = gravity;
 
-  this.columns      = 12;
-  this.rows         = 9;
+  this.columns      = 20;
+  this.rows         = 15;
 
-  this.tile_set     = new TileSet(8, 16);
+  //20 is column, 32 is the pixel size
+  this.tile_set     = new TileSet(19, 32);
+
+  //players default place 32 76
   this.player       = new Player(32, 76);
 
   this.zone_id      = "00";
@@ -71,12 +68,12 @@ World.prototype = {
     this.carrots            = new Array();
     this.doors              = new Array();
     this.grass              = new Array();
-    this.collision_map      = zone.collision_map;
-    this.graphical_map      = zone.graphical_map;
+    this.collision_map      = zone.map;
+    this.graphical_map      = zone.map;
     this.columns            = zone.columns;
     this.rows               = zone.rows;
     this.zone_id            = zone.id;
-
+/*
     for (let index = zone.carrots.length - 1; index > -1; -- index) {
 
       let carrot = zone.carrots[index];
@@ -116,14 +113,14 @@ World.prototype = {
 
       this.door = undefined;// Make sure to reset this.door so we don't trigger a zone load.
 
-    }
+    }*/
 
   },
 
   update:function() {
 
     this.player.updatePosition(this.gravity, this.friction);
-
+    this.coll
     this.collideObject(this.player);
 
     for (let index = this.carrots.length - 1; index > -1; -- index) {

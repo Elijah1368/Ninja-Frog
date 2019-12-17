@@ -1,4 +1,4 @@
-import Game from "./Game/Game.js";
+import World from "./Game/World.js";
 import Display from "./Display.js";
 import Controller from "./Controller.js";
 import Engine from "./Engine.js";
@@ -78,17 +78,17 @@ window.addEventListener("load", function(event) {
 
   };
 
-  //jsut resizes the canvas to fit game world
+  //jsut resizes the canvas to fit world
   var resize = function(event) {
 
-    display.resize(document.documentElement.clientWidth, document.documentElement.clientHeight, game.world.height / game.world.width);
+    display.resize(document.documentElement.clientWidth, document.documentElement.clientHeight, world.height / world.width);
     display.render();
 
     var rectangle = display.context.canvas.getBoundingClientRect();
 
     p.style.left = rectangle.left + "px";
-    p.style.top  = rectangle.top + "px";
-    p.style.fontSize = game.world.tile_set.tile_size * rectangle.height / game.world.height + "px";
+    p.style.top  = rectangle.top + "px"; 
+    p.style.fontSize = world.tile_set.tile_size * rectangle.height / world.height + "px";
 
   };
 
@@ -99,42 +99,14 @@ window.addEventListener("load", function(event) {
     var frame = undefined;
     
     display.drawMap   (assets_manager.tile_set_image,
-    game.world.tile_set.columns, game.world.graphical_map, game.world.columns,  game.world.tile_set.tile_size);
-
-    for (let index = game.world.carrots.length - 1; index > -1; -- index) {
-
-      let carrot = game.world.carrots[index];
-
-      frame = game.world.tile_set.frames[carrot.frame_value];
-
-      display.drawObject(assets_manager.tile_set_image,
-      frame.x, frame.y,
-      carrot.x + Math.floor(carrot.width * 0.5 - frame.width * 0.5) + frame.offset_x,
-      carrot.y + frame.offset_y, frame.width, frame.height);
-
-    }
-
-    frame = game.world.tile_set.frames[game.world.player.frame_value];
+    world.tile_set.columns, world.graphical_map, world.columns,  world.tile_set.tile_size);
+    
+    frame = world.tile_set.frames[world.player.frame_value];
 
     display.drawObject(assets_manager.tile_set_image,
     frame.x, frame.y,
-    game.world.player.x + Math.floor(game.world.player.width * 0.5 - frame.width * 0.5) + frame.offset_x,
-    game.world.player.y + frame.offset_y, frame.width, frame.height);
-
-    for (let index = game.world.grass.length - 1; index > -1; -- index) {
-
-      let grass = game.world.grass[index];
-
-      frame = game.world.tile_set.frames[grass.frame_value];
-
-      display.drawObject(assets_manager.tile_set_image,
-      frame.x, frame.y,
-      grass.x + frame.offset_x,
-      grass.y + frame.offset_y, frame.width, frame.height);
-
-    }
-
-    p.innerHTML = "Carrots: " + game.world.carrot_count;
+    world.player.x + Math.floor(world.player.width * 0.5 - frame.width * 0.5) + frame.offset_x,
+    world.player.y + frame.offset_y, frame.width, frame.height);
 
     display.render();
 
@@ -142,19 +114,19 @@ window.addEventListener("load", function(event) {
 
   var update = function() {
 
-    if (controller.left.active ) { game.world.player.moveLeft ();                               }
-    if (controller.right.active) { game.world.player.moveRight();                               }
-    if (controller.up.active   ) { game.world.player.jump();      controller.up.active = false; }
+    if (controller.left.active ) { world.player.moveLeft ();                               }
+    if (controller.right.active) { world.player.moveRight();                               }
+    if (controller.up.active   ) { world.player.jump();      controller.up.active = false; }
 
-    game.update();
+    world.update();
 
-    if (game.world.door) {
+    if (world.door) {
 
       engine.stop();
 
-      assets_manager.requestJSON(ZONE_PREFIX + game.world.door.destination_zone + ZONE_SUFFIX, (zone) => {
+      assets_manager.requestJSON(ZONE_PREFIX + world.door.destination_zone + ZONE_SUFFIX, (zone) => {
 
-        game.world.setup(zone);
+        world.setup(zone);
 
         engine.start();
 
@@ -173,7 +145,7 @@ window.addEventListener("load", function(event) {
   var assets_manager = new AssetsManager();
   var controller     = new Controller();
   var display        = new Display(document.querySelector("canvas"));
-  var game           = new Game();
+  var world         = new World();
   var engine         = new Engine(1000/30, render, update);
 
   var p              = document.createElement("p");
@@ -185,15 +157,15 @@ window.addEventListener("load", function(event) {
     //// INITIALIZE ////
   ////////////////////
 
-  display.buffer.canvas.height = game.world.height;
-  display.buffer.canvas.width  = game.world.width;
+  display.buffer.canvas.height = world.height;
+  display.buffer.canvas.width  = world.width;
   display.buffer.imageSmoothingEnabled = false;
 
-  assets_manager.requestJSON(ZONE_PREFIX + game.world.zone_id + ZONE_SUFFIX, (zone) => {
+  assets_manager.requestJSON(ZONE_PREFIX + world.zone_id + ZONE_SUFFIX, (zone) => {
 
-    game.world.setup(zone);
+    world.setup(zone);
 
-    assets_manager.requestImage("rabbit-trap.png", (image) => {
+    assets_manager.requestImage("./Assets/SpriteSheet.png", (image) => {
 
       assets_manager.tile_set_image = image;
 

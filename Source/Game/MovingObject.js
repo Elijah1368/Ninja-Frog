@@ -3,7 +3,6 @@ import Matter from "./Matter.js";
 const MovingObject = function(x, y, width, height, velocity_max = 15) {
 
   Matter.call(this, x, y, width, height);
-
   this.jumping      = false;
   this.velocity_max = velocity_max;// added velocity_max so velocity can't go past 16
   this.velocity_x   = 0;
