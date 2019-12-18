@@ -46,11 +46,32 @@ const TileSet = function(columns, tile_size) {
   for (let i = 1; i <= 5; i++){
     this.frames.push(new f(32 * i + 160, 32 * 5, 32, 32, 0, offset));
   } 
-
+ 
   //saw
   for (let i = 1; i <= 8; i++){
-    this.frames.push(new f(32 * i + 256, 32 * 7, 32, 32, 0, offset));
+    this.frames.push(new f(32 * i + 224, 32 * 7, 32, 32, 0, offset));
   } 
+
+  //lose-right
+  for (let i = 1; i <= 7; i++){
+    this.frames.push(new f(32 * i, 32 * 7, 32, 32, 0, offset));
+  } 
+
+  //lose-left
+  for (let i = 1; i <= 7; i++){
+    this.frames.push(new f(32 * i,  32 * 8, 32, 32, 0, offset));
+  } 
+
+  //dissapear
+  for (let i = 1; i <= 7; i++){
+    this.frames.push(new f(32 * i + 224, 32 * 8, 32, 32, 0, offset));
+  } 
+  //appear
+  for (let i = 1; i <= 7; i++){
+    this.frames.push(new f(32 * i + 224, 32 * 9, 32, 32, 0, offset));
+  } 
+
+
 };
 TileSet.prototype = { constructor: TileSet };
 export default TileSet;

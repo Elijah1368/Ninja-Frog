@@ -27,7 +27,7 @@ window.addEventListener("load", function(event) {
     this.tile_set_image = undefined;
     this.audio_urls = ["Assets/Sound/Music.mp3", "Assets/Sound/EnemyDamage.mp3", "Assets/Sound/Walk.mp3",
                 "Assets/Sound/Jump.mp3", "Assets/Sound/Lose.mp3", "Assets/Sound/Win.mp3", 
-                "Assets/Sound/PlayerDamage.mp3"];
+                "Assets/Sound/PlayerDamage.mp3", "Assets/Sound/Appear.mp3"];
   };
 
   AssetsManager.prototype = {
@@ -115,20 +115,20 @@ window.addEventListener("load", function(event) {
     
     display.drawMap   (assets_manager.tile_set_image,
     world.tile_set.columns, world.graphical_map, world.columns,  world.tile_set.tile_size);
-    for (let i = 0; i < world.saw; i++) {
+     
+    for (let i = 0; i < world.saws.length; i++) {
 
-      let saw = game.world.saws[i];
-
-      frame = game.world.tile_set.frames[saw.frame_value];
+      let saw = world.saws[i];
+      frame = world.tile_set.frames[saw.frame_value];
 
       display.drawObject(assets_manager.tile_set_image,
       frame.x, frame.y,
       saw.x,
-      saw.y);
+      saw.y, frame.width, frame.height);
 
     }
-    /*
-    
+
+       /*
     for (let index = game.world.carrots.length - 1; index > -1; -- index) {
 
       let carrot = game.world.carrots[index];
@@ -213,7 +213,7 @@ window.addEventListener("load", function(event) {
   assets_manager.requestJSON(ZONE_PREFIX + world.zone_id + ZONE_SUFFIX, (zone) => {
 
     world.setup(zone);
-    assets_manager.requestImage("./Assets/SpriteSheet.png", (image) => {
+    assets_manager.requestImage("./Assets/SpriteSheet2.png", (image) => {
 
       assets_manager.tile_set_image = image;
 

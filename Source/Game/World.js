@@ -81,7 +81,8 @@ World.prototype = {
 
     for (let i = 0; i < saw.length; i++){
       let index = saw[i];
-      this.saws.push(new Saw(index % this.rows * this.tile_set.tile_size, (index / this.columns) *this.tile_size ));
+      this.saws.push(new Saw((index % this.columns) * this.tile_set.tile_size, (Math.ceil(index  / this.columns) - 1) * this.tile_set.tile_size));
+     // debugger;
     }
 /*
     for (let index = zone.saws.length - 1; index > -1; -- index) {
@@ -133,16 +134,13 @@ World.prototype = {
     let playerCollided = this.collideObject(this.player);
     this.updatePlayer(playerCollided);
 
-    for (let i = 0; i < this.saws.length; i) {
+    for (let i = 0; i < this.saws.length; i++) {
 
       let saw = this.saws[i];
       saw.animate();
 
-      if (saw.collideObject(this.player)) {
-
-        this.saws.splice(this.saws.indexOf(saw), 1);
-        this.saw_count ++;
-
+      if (saw.collideObject(this.player) && this.player.lost == false) {
+        this.player.lose();
       }
 
     }
@@ -159,13 +157,6 @@ World.prototype = {
 
     }
 
-    for (let index = this.grass.length - 1; index > -1; -- index) {
-
-      let grass = this.grass[index];
-
-      grass.animate();
-
-    }
 
     this.player.updateAnimation();
 

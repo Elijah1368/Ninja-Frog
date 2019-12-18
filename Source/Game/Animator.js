@@ -3,7 +3,7 @@
 const Animator = function(frame_set, delay = 3, mode = "loop") {
 
  this.count       = 0;
- this.delay       = 1;
+ this.delay       = delay;
  this.frame_set   = frame_set;
  this.frame_index = 0;
  this.frame_value = frame_set[0];
@@ -30,6 +30,8 @@ Animator.prototype = {
   }
 
  },
+
+
 
  changeFrameSet(frame_set, delay = 1, frame_index = 0) {
 

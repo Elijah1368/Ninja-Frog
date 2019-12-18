@@ -5,7 +5,7 @@ const Player = function(soundPlayer, x, y) {
   this.soundPlayer = soundPlayer;
   MovingObject.call(this, x, y, 14, 24);
 
-  Animator.call(this, Player.prototype.frame_sets["idle-left"], 10);
+  Animator.call(this, Player.prototype.frame_sets["idle-left"], 1);
 
   this.jumpCount = 0;
   this.direction_x = -1;
@@ -14,6 +14,8 @@ const Player = function(soundPlayer, x, y) {
   this.old_velocity = 0;
   this.wallClimbing = false;
   this.isGrounded = true;
+  this.lost = false;
+  this.appear = false;
 };
 
 Player.prototype = {
@@ -29,7 +31,10 @@ Player.prototype = {
     "double-jump-right": [48, 49, 50, 51, 52, 53],
     "double-jump-left": [54, 55, 56, 57, 58, 59],
     "wall-climbing-right": [60, 61, 62, 63, 64],
-    "wall-climbing-left": [65, 66, 67, 68, 69]
+    "wall-climbing-left": [65, 66, 67, 68, 69],
+    "lose-right": [78, 79, 80, 81, 82, 83, 84, 78, 79, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105],
+    "lose-left": [90, 91, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105],
+    "appear": [99, 100, 101, 102, 103, 104, 105]
   },
 
   jump: function() {
@@ -63,12 +68,19 @@ Player.prototype = {
   },
 
   updateAnimation:function() {
-    if (this.wallClimbing){ 
+  
+    if (this.lost){
       if (this.direction_x < 0) {
-        this.changeFrameSet(this.frame_sets["wall-climbing-left"], .1)
+        this.changeFrameSet(this.frame_sets["lose-left"], 2)
+      } else {
+        this.changeFrameSet(this.frame_sets["lose-right"], 2)
+      }
+    } else if (this.wallClimbing){ 
+      if (this.direction_x < 0) {
+        this.changeFrameSet(this.frame_sets["wall-climbing-left"], 3)
       } else if (this.direction_x > 0) {
   
-        this.changeFrameSet(this.frame_sets["wall-climbing-right"], .1)
+        this.changeFrameSet(this.frame_sets["wall-climbing-right"], 3)
       }
     } else if (this.velocity_y < 0) {
 
@@ -76,26 +88,45 @@ Player.prototype = {
         if (this.direction_x < 0) this.changeFrameSet(this.frame_sets["jump-left"]);
         else this.changeFrameSet(this.frame_sets["jump-right"]);
       } else if (this.jumpCount == 2) {
-        if (this.direction_x < 0) this.changeFrameSet(this.frame_sets["double-jump-right"], .5);
-        else this.changeFrameSet(this.frame_sets["double-jump-left"], .5);
+        if (this.direction_x < 0) this.changeFrameSet(this.frame_sets["double-jump-right"], 1);
+        else this.changeFrameSet(this.frame_sets["double-jump-left"], 1);
       }
 
     } else if (this.direction_x < 0) {
 
       if (this.velocity_x < -0.1) this.changeFrameSet(this.frame_sets["move-left"], 1);
-      else this.changeFrameSet(this.frame_sets["idle-left"], 2);
+      else this.changeFrameSet(this.frame_sets["idle-left"], 1);
       
     } else if (this.direction_x > 0) {
 
       if (this.velocity_x > 0.1) this.changeFrameSet(this.frame_sets["move-right"], 1);
-      else this.changeFrameSet(this.frame_sets["idle-right"], 2);
+      else this.changeFrameSet(this.frame_sets["idle-right"], 1);
     }
 
     this.animate();
 
   },
-  updatePosition:function(gravity, friction) {
+  lose:function(){
+    this.lost = true;
+    this.soundPlayer.play("enemydamage");
 
+    setTimeout(()=>
+    {
+      this.x  = 32;
+      this.y = 76;
+      setTimeout(()=>{
+        this.lost = false;
+        this.soundPlayer.play("appear");
+      }, 200);
+    }, 700);
+  },
+
+  updatePosition:function(gravity, friction) {
+    if (this.lost) {
+      this.velocity_x = 0;
+      this.velocity_y = 0;
+      return;      
+    }
     this.x_old = this.x;
     this.y_old = this.y;
      
@@ -116,9 +147,11 @@ Player.prototype = {
     if (Math.abs(this.velocity_y) > this.velocity_y_max)
     this.velocity_y = this.velocity_y_max * Math.sign(this.velocity_y);
 
+   
     this.x    += this.velocity_x;
     this.y    += this.velocity_y;
-  },
+  }
+
 
 };
 Object.assign(Player.prototype, MovingObject.prototype);
