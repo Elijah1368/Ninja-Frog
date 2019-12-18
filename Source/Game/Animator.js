@@ -1,6 +1,6 @@
 
 
-const Animator = function(frame_set, delay, mode = "loop") {
+const Animator = function(frame_set, delay = 3, mode = "loop") {
 
  this.count       = 0;
  this.delay       = 1;

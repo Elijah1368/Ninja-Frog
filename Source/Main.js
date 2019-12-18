@@ -2,6 +2,7 @@ import World from "./Game/World.js";
 import Display from "./Display.js";
 import Controller from "./Controller.js";
 import Engine from "./Engine.js";
+import SoundPlayer from "./SoundPlayer.js";
 
 /*
 Load the files before starting the game
@@ -24,7 +25,9 @@ window.addEventListener("load", function(event) {
   const AssetsManager = function() {
 
     this.tile_set_image = undefined;
-
+    this.audio_urls = ["Assets/Sound/Music.mp3", "Assets/Sound/EnemyDamage.mp3", "Assets/Sound/Walk.mp3",
+                "Assets/Sound/Jump.mp3", "Assets/Sound/Lose.mp3", "Assets/Sound/Win.mp3", 
+                "Assets/Sound/PlayerDamage.mp3"];
   };
 
   AssetsManager.prototype = {
@@ -65,6 +68,22 @@ window.addEventListener("load", function(event) {
 
     },
 
+    loadAudioFiles:function(){
+      let audioFiles = {};
+      for (let url of this.audio_urls){
+        let name = url.match(/(\w*)\.mp3/)[1].toLowerCase();
+        let audio = new Audio(url);
+        audioFiles[name] = audio;
+      }
+
+      let soundPlayer = new SoundPlayer(audioFiles);
+      soundPlayer.adjustSpeed("walk", 2.5);
+      soundPlayer.adjustSpeed("music", 1.3);
+      soundPlayer.adjustVolume("music", .8);
+      soundPlayer.adjustVolume("jump", .8);
+      return soundPlayer;
+    }
+
   };
 
       ///////////////////
@@ -86,10 +105,6 @@ window.addEventListener("load", function(event) {
 
     var rectangle = display.context.canvas.getBoundingClientRect();
 
-    p.style.left = rectangle.left + "px";
-    p.style.top  = rectangle.top + "px"; 
-    p.style.fontSize = world.tile_set.tile_size * rectangle.height / world.height + "px";
-
   };
 
   //very important as it is part of the engine
@@ -100,7 +115,34 @@ window.addEventListener("load", function(event) {
     
     display.drawMap   (assets_manager.tile_set_image,
     world.tile_set.columns, world.graphical_map, world.columns,  world.tile_set.tile_size);
+    for (let i = 0; i < world.saw; i++) {
+
+      let saw = game.world.saws[i];
+
+      frame = game.world.tile_set.frames[saw.frame_value];
+
+      display.drawObject(assets_manager.tile_set_image,
+      frame.x, frame.y,
+      saw.x,
+      saw.y);
+
+    }
+    /*
     
+    for (let index = game.world.carrots.length - 1; index > -1; -- index) {
+
+      let carrot = game.world.carrots[index];
+
+      frame = game.world.tile_set.frames[carrot.frame_value];
+
+      display.drawObject(assets_manager.tile_set_image,
+      frame.x, frame.y,
+      carrot.x + Math.floor(carrot.width * 0.5 - frame.width * 0.5) + frame.offset_x,
+      carrot.y + frame.offset_y, frame.width, frame.height);
+
+    }
+
+    */
     frame = world.tile_set.frames[world.player.frame_value];
 
     display.drawObject(assets_manager.tile_set_image,
@@ -114,9 +156,16 @@ window.addEventListener("load", function(event) {
 
   var update = function() {
 
-    if (controller.left.active ) { world.player.moveLeft ();                               }
-    if (controller.right.active) { world.player.moveRight();                               }
-    if (controller.up.active   ) { world.player.jump();      controller.up.active = false; }
+    if (controller.left.active ) { 
+      world.player.moveLeft ();
+    }
+    if (controller.right.active) { 
+      world.player.moveRight();
+    }
+    if (controller.up.active) { 
+      world.player.jump();
+      controller.up.active = false;
+    }
 
     world.update();
 
@@ -143,15 +192,11 @@ window.addEventListener("load", function(event) {
   /////////////////
 
   var assets_manager = new AssetsManager();
+  var soundPlayer = assets_manager.loadAudioFiles();
   var controller     = new Controller();
   var display        = new Display(document.querySelector("canvas"));
-  var world         = new World();
+  var world         = new World(soundPlayer);
   var engine         = new Engine(1000/30, render, update);
-
-  var p              = document.createElement("p");
-  p.setAttribute("style", "color:#c07000; font-size:2.0em; position:fixed;");
-  p.innerHTML = "Carrots: 0";
-  document.body.appendChild(p);
 
       ////////////////////
     //// INITIALIZE ////
@@ -161,10 +206,13 @@ window.addEventListener("load", function(event) {
   display.buffer.canvas.width  = world.width;
   display.buffer.imageSmoothingEnabled = false;
 
+
+
+  
+
   assets_manager.requestJSON(ZONE_PREFIX + world.zone_id + ZONE_SUFFIX, (zone) => {
 
     world.setup(zone);
-
     assets_manager.requestImage("./Assets/SpriteSheet.png", (image) => {
 
       assets_manager.tile_set_image = image;

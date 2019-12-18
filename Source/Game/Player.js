@@ -1,7 +1,8 @@
 import Animator from "./Animator.js";
 import MovingObject from "./MovingObject.js";
 
-const Player = function(x, y) {
+const Player = function(soundPlayer, x, y) {
+  this.soundPlayer = soundPlayer;
   MovingObject.call(this, x, y, 14, 24);
 
   Animator.call(this, Player.prototype.frame_sets["idle-left"], 10);
@@ -11,8 +12,8 @@ const Player = function(x, y) {
   this.velocity_x  = 0;
   this.velocity_y  = 0;
   this.old_velocity = 0;
-  this.isGrounded = true;
   this.wallClimbing = false;
+  this.isGrounded = true;
 };
 
 Player.prototype = {
@@ -36,25 +37,29 @@ Player.prototype = {
     /* Made it so you can only jump if you aren't falling faster than 10px per frame. */
     if (this.jumpCount < 2) {
       this.jumpCount++
-      this.velocity_y -= 15;
-      this.wallClimbing = false;
-      this.isGrounded = false;
+      this.velocity_y = -15;
+      if (this.wallClimbing) {
+        this.velocity_x = -1 * this.direction_x * 10;
+      }
+      this.soundPlayer.play("music");
+      this.soundPlayer.play("jump");
     } 
+
 
   },
 
   moveLeft: function() {
-
     this.direction_x = -1;
-    this.velocity_x = -15;
-    this.wallClimbing = false;
+    this.velocity_x -= 2;
+    this.soundPlayer.play("music");
+    if(this.isGrounded) this.soundPlayer.play("walk");
   },
 
   moveRight:function(frame_set) {
-
     this.direction_x = 1;
-    this.velocity_x = 15;
-    this.wallClimbing = false;
+    this.velocity_x += 2;
+    this.soundPlayer.play("music");
+    if(this.isGrounded) this.soundPlayer.play("walk");
   },
 
   updateAnimation:function() {
@@ -68,22 +73,22 @@ Player.prototype = {
     } else if (this.velocity_y < 0) {
 
       if (this.jumpCount == 1) {
-        if (this.direction_x < 0) this.changeFrameSet(this.frame_sets["jump-left"], .1);
-        else this.changeFrameSet(this.frame_sets["jump-right"], .1);
+        if (this.direction_x < 0) this.changeFrameSet(this.frame_sets["jump-left"]);
+        else this.changeFrameSet(this.frame_sets["jump-right"]);
       } else if (this.jumpCount == 2) {
-        if (this.direction_x < 0) this.changeFrameSet(this.frame_sets["double-jump-right"], .1);
-        else this.changeFrameSet(this.frame_sets["double-jump-left"], .1);
+        if (this.direction_x < 0) this.changeFrameSet(this.frame_sets["double-jump-right"], .5);
+        else this.changeFrameSet(this.frame_sets["double-jump-left"], .5);
       }
 
     } else if (this.direction_x < 0) {
 
       if (this.velocity_x < -0.1) this.changeFrameSet(this.frame_sets["move-left"], 1);
-      else this.changeFrameSet(this.frame_sets["idle-left"]);
+      else this.changeFrameSet(this.frame_sets["idle-left"], 2);
       
     } else if (this.direction_x > 0) {
 
       if (this.velocity_x > 0.1) this.changeFrameSet(this.frame_sets["move-right"], 1);
-      else this.changeFrameSet(this.frame_sets["idle-right"]);
+      else this.changeFrameSet(this.frame_sets["idle-right"], 2);
     }
 
     this.animate();
@@ -93,15 +98,23 @@ Player.prototype = {
 
     this.x_old = this.x;
     this.y_old = this.y;
-    this.velocity_y += gravity;
-    this.velocity_x *= friction;
+     
+    //if player is attached to wall, slow down fall
+    if (this.wallClimbing && this.jumpCount == 2){
+        
+    } else if (this.wallClimbing) {
+      this.velocity_y = .5 +  this.velocity_y * .5;
+    } else {
+      this.velocity_y += gravity;
+    }
+    this.velocity_x *= friction;  
 
     /* Made it so that velocity cannot exceed velocity_max */
-    if (Math.abs(this.velocity_x) > this.velocity_max)
-    this.velocity_x = this.velocity_max * Math.sign(this.velocity_x);
+    if (Math.abs(this.velocity_x) > this.velocity_x_max)
+    this.velocity_x = this.velocity_x_max * Math.sign(this.velocity_x);
 
-    if (Math.abs(this.velocity_y) > this.velocity_max)
-    this.velocity_y = this.velocity_max * Math.sign(this.velocity_y);
+    if (Math.abs(this.velocity_y) > this.velocity_y_max)
+    this.velocity_y = this.velocity_y_max * Math.sign(this.velocity_y);
 
     this.x    += this.velocity_x;
     this.y    += this.velocity_y;

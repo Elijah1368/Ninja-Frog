@@ -2,9 +2,10 @@
 import Collider from "./Collider.js";
 import Player from "./Player.js";
 import TileSet from "./TileSet.js";
+import Saw from "./Saw.js";
 
-const World = function(friction = 0.4, gravity = 2) {
-
+const World = function(soundPlayer, friction = 0.85, gravity = 1.5) {
+  this.soundPlayer = soundPlayer;
   this.collider     = new Collider();
 
   this.friction     = friction;
@@ -17,12 +18,12 @@ const World = function(friction = 0.4, gravity = 2) {
   this.tile_set     = new TileSet(19, 32);
 
   //players default place 32 76
-  this.player       = new Player(32, 76);
+  this.player       = new Player(soundPlayer, 32, 76);
 
   this.zone_id      = "00";
 
-  this.carrots      = [];// the array of carrots in this zone;
-  this.carrot_count = 0;// the number of carrots you have.
+  this.saws     = [];// the array of saws in this zone;
+  this.saw_count = 0;// the number of saws you have.
   this.doors        = [];
   this.door         = undefined;
 
@@ -40,44 +41,53 @@ World.prototype = {
     the player from falling out of the world. */
 
     var bottom, left, right, top, value;
-
+    let playerCollided = {
+      "left": false,
+      "top": false,
+      "right": false, 
+      "bottom": false
+    }
     top    = Math.floor(object.getTop()    / this.tile_set.tile_size);
     left   = Math.floor(object.getLeft()   / this.tile_set.tile_size);
     value  = this.collision_map[top * this.columns + left];
-    this.collider.collide(value, object, left * this.tile_set.tile_size, top * this.tile_set.tile_size, this.tile_set.tile_size);
+    this.collider.collide(value, object, left * this.tile_set.tile_size, top * this.tile_set.tile_size, this.tile_set.tile_size, playerCollided);
 
     top    = Math.floor(object.getTop()    / this.tile_set.tile_size);
     right  = Math.floor(object.getRight()  / this.tile_set.tile_size);
     value  = this.collision_map[top * this.columns + right];
-    this.collider.collide(value, object, right * this.tile_set.tile_size, top * this.tile_set.tile_size, this.tile_set.tile_size);
+    this.collider.collide(value, object, right * this.tile_set.tile_size, top * this.tile_set.tile_size, this.tile_set.tile_size, playerCollided);
 
     bottom = Math.floor(object.getBottom() / this.tile_set.tile_size);
     left   = Math.floor(object.getLeft()   / this.tile_set.tile_size);
     value  = this.collision_map[bottom * this.columns + left];
-    this.collider.collide(value, object, left * this.tile_set.tile_size, bottom * this.tile_set.tile_size, this.tile_set.tile_size);
+    this.collider.collide(value, object, left * this.tile_set.tile_size, bottom * this.tile_set.tile_size, this.tile_set.tile_size, playerCollided);
 
     bottom = Math.floor(object.getBottom() / this.tile_set.tile_size);
     right  = Math.floor(object.getRight()  / this.tile_set.tile_size);
     value  = this.collision_map[bottom * this.columns + right];
-    this.collider.collide(value, object, right * this.tile_set.tile_size, bottom * this.tile_set.tile_size, this.tile_set.tile_size);
-
+    this.collider.collide(value, object, right * this.tile_set.tile_size, bottom * this.tile_set.tile_size, this.tile_set.tile_size, playerCollided);
+    return playerCollided;
   },
 
   setup:function(zone) {
 
-    this.carrots            = new Array();
-    this.doors              = new Array();
-    this.grass              = new Array();
+    let saw = [];
+    zone.saw.map((elem, i) => {if (elem == 142) saw.push(i)});
     this.collision_map      = zone.map;
     this.graphical_map      = zone.map;
     this.columns            = zone.columns;
     this.rows               = zone.rows;
     this.zone_id            = zone.id;
-/*
-    for (let index = zone.carrots.length - 1; index > -1; -- index) {
 
-      let carrot = zone.carrots[index];
-      this.carrots[index] = new Carrot(carrot[0] * this.tile_set.tile_size + 5, carrot[1] * this.tile_set.tile_size - 2);
+    for (let i = 0; i < saw.length; i++){
+      let index = saw[i];
+      this.saws.push(new Saw(index % this.rows * this.tile_set.tile_size, (index / this.columns) *this.tile_size ));
+    }
+/*
+    for (let index = zone.saws.length - 1; index > -1; -- index) {
+
+      let saw = zone.saws[index];
+      this.saws[index] = new saw(saw[0] * this.tile_set.tile_size + 5, saw[1] * this.tile_set.tile_size - 2);
 
     }
 
@@ -118,22 +128,20 @@ World.prototype = {
   },
 
   update:function() {
-
+ 
     this.player.updatePosition(this.gravity, this.friction);
-    this.coll
-    this.collideObject(this.player);
+    let playerCollided = this.collideObject(this.player);
+    this.updatePlayer(playerCollided);
 
-    for (let index = this.carrots.length - 1; index > -1; -- index) {
+    for (let i = 0; i < this.saws.length; i) {
 
-      let carrot = this.carrots[index];
+      let saw = this.saws[i];
+      saw.animate();
 
-      carrot.updatePosition();
-      carrot.animate();
+      if (saw.collideObject(this.player)) {
 
-      if (carrot.collideObject(this.player)) {
-
-        this.carrots.splice(this.carrots.indexOf(carrot), 1);
-        this.carrot_count ++;
+        this.saws.splice(this.saws.indexOf(saw), 1);
+        this.saw_count ++;
 
       }
 
@@ -161,8 +169,32 @@ World.prototype = {
 
     this.player.updateAnimation();
 
-  }
+  },
 
+  updatePlayer:function({left: collidedLeft, top: collidedTop, right: collidedRight, bottom: collidedBottom}){
+    if (collidedLeft){
+      if (!collidedBottom){
+        this.player.wallClimbing = true;
+        this.player.jumpCount = 1;
+        this.player.isGrounded = false;
+      }
+    } else if (collidedTop){
+      
+    } else if (collidedRight) {
+      if (!collidedBottom){
+        this.player.wallClimbing = true;
+        this.player.jumpCount = 1;
+        this.player.isGrounded = false;
+      }
+    } else if (collidedBottom){
+      this.player.wallClimbing = false;
+      this.player.jumpCount = 0;
+      this.player.isGrounded = true;
+    } else {
+      this.player.wallClimbing = false;
+      this.player.isGrounded = false;
+    }
+  }
 };
 
 export default World;
