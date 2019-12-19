@@ -71,6 +71,11 @@ const TileSet = function(columns, tile_size) {
     this.frames.push(new f(32 * i + 224, 32 * 9, 32, 32, 0, offset));
   } 
 
+  //trophy
+  this.frames.push(new f(352, 32 * 5, 64, 64, 0, offset));
+  
+  //literally nothiung
+  this.frames.push(new f(96, 32 * 6, 32, 32, 0, 0));
 
 };
 TileSet.prototype = { constructor: TileSet };

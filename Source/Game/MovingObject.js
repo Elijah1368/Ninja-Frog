@@ -1,6 +1,6 @@
 import Matter from "./Matter.js";
 
-const MovingObject = function(x, y, width, height, velocity_y_max = 15, velocity_x_max = 30) {
+const MovingObject = function(x, y, width, height, velocity_y_max = 20, velocity_x_max = 30) {
 
   Matter.call(this, x, y, width, height);
   this.jumping      = false;

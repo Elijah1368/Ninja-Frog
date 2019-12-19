@@ -1,12 +1,13 @@
 import Animator from "./Animator.js";
 import MovingObject from "./MovingObject.js";
 
-const Player = function(soundPlayer, x, y) {
-  this.soundPlayer = soundPlayer;
+const Player = function(x, y) {
   MovingObject.call(this, x, y, 14, 24);
 
   Animator.call(this, Player.prototype.frame_sets["idle-left"], 1);
 
+  this.soundMaking = "none";
+  this.repeatSound = true;
   this.jumpCount = 0;
   this.direction_x = -1;
   this.velocity_x  = 0;
@@ -21,7 +22,6 @@ const Player = function(soundPlayer, x, y) {
 Player.prototype = {
 
   frame_sets: {
-
     "idle-left" : [0, 1, 2, 3, 4, 5, 6, 7 , 8, 9, 10],
     "jump-left" : [47],
     "move-left" : [34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45],
@@ -32,9 +32,10 @@ Player.prototype = {
     "double-jump-left": [54, 55, 56, 57, 58, 59],
     "wall-climbing-right": [60, 61, 62, 63, 64],
     "wall-climbing-left": [65, 66, 67, 68, 69],
-    "lose-right": [78, 79, 80, 81, 82, 83, 84, 78, 79, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105],
-    "lose-left": [90, 91, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105],
-    "appear": [99, 100, 101, 102, 103, 104, 105]
+    "lose-right": [78, 79, 80, 81, 82, 83, 84, 78, 79,  99, 100, 101, 102, 103, 107],
+    "lose-left": [90, 91, 85, 86, 87, 88, 89, 90, 91, 99, 100, 101, 102, 103, 107],
+    "appear":     [92, 93, 94, 95, 96, 97, 98]
+
   },
 
   jump: function() {
@@ -42,87 +43,113 @@ Player.prototype = {
     /* Made it so you can only jump if you aren't falling faster than 10px per frame. */
     if (this.jumpCount < 2) {
       this.jumpCount++
-      this.velocity_y = -15;
+      this.velocity_y = -20;
       if (this.wallClimbing) {
-        this.velocity_x = -1 * this.direction_x * 10;
+        this.velocity_x = -1 * this.direction_x * 20;
       }
-      this.soundPlayer.play("music");
-      this.soundPlayer.play("jump");
     } 
-
-
   },
 
   moveLeft: function() {
     this.direction_x = -1;
-    this.velocity_x -= 2;
-    this.soundPlayer.play("music");
-    if(this.isGrounded) this.soundPlayer.play("walk");
+    this.velocity_x -= 3;
   },
 
   moveRight:function(frame_set) {
     this.direction_x = 1;
-    this.velocity_x += 2;
-    this.soundPlayer.play("music");
-    if(this.isGrounded) this.soundPlayer.play("walk");
+    this.velocity_x += 3;
+  },
+
+  updateSound:function(){
+    if (this.velocity_y < -15){
+      this.soundMaking = "jump";
+    } else if (this.isGrounded && (this.velocity_x > 3 || this.velocity_x < -3)) {
+      this.soundMaking = "walk";
+    } else if (this.lost && this.repeatSound == true){
+      this.soundMaking = "enemydamage";
+      this.repeatSound = false;
+    } else if (this.appear && this.repeatSound == true) {
+      this.soundMaking = "appear";
+      this.repeatSound = false;
+    } else  {
+      this.soundMaking = "none";
+    }
   },
 
   updateAnimation:function() {
   
-    if (this.lost){
-      if (this.direction_x < 0) {
-        this.changeFrameSet(this.frame_sets["lose-left"], 2)
-      } else {
-        this.changeFrameSet(this.frame_sets["lose-right"], 2)
-      }
-    } else if (this.wallClimbing){ 
+    if (this.wallClimbing){ 
+
       if (this.direction_x < 0) {
         this.changeFrameSet(this.frame_sets["wall-climbing-left"], 3)
       } else if (this.direction_x > 0) {
-  
         this.changeFrameSet(this.frame_sets["wall-climbing-right"], 3)
       }
+
     } else if (this.velocity_y < 0) {
 
       if (this.jumpCount == 1) {
-        if (this.direction_x < 0) this.changeFrameSet(this.frame_sets["jump-left"]);
-        else this.changeFrameSet(this.frame_sets["jump-right"]);
+        if (this.direction_x < 0) this.changeFrameSet(this.frame_sets["jump-left"], "playOnce");
+        else this.changeFrameSet(this.frame_sets["jump-right"], "playOnce");
       } else if (this.jumpCount == 2) {
         if (this.direction_x < 0) this.changeFrameSet(this.frame_sets["double-jump-right"], 1);
         else this.changeFrameSet(this.frame_sets["double-jump-left"], 1);
       }
 
+    } else if (this.lost){
+
+      if (this.direction_x < 0) {
+        this.changeFrameSet(this.frame_sets["lose-left"], 2, 0, "playOnce")
+      } else {
+        this.changeFrameSet(this.frame_sets["lose-right"], 2, 0, "playOnce")
+      }
+    } else if (this.appear) {
+      this.changeFrameSet(this.frame_sets["appear"], 2,  0,"playOnce");
     } else if (this.direction_x < 0) {
 
-      if (this.velocity_x < -0.1) this.changeFrameSet(this.frame_sets["move-left"], 1);
+      if (this.velocity_x < -3) this.changeFrameSet(this.frame_sets["move-left"], 1);
       else this.changeFrameSet(this.frame_sets["idle-left"], 1);
       
     } else if (this.direction_x > 0) {
 
-      if (this.velocity_x > 0.1) this.changeFrameSet(this.frame_sets["move-right"], 1);
+      if (this.velocity_x > 3) this.changeFrameSet(this.frame_sets["move-right"], 1);
       else this.changeFrameSet(this.frame_sets["idle-right"], 1);
-    }
+
+    } 
 
     this.animate();
 
   },
   lose:function(){
     this.lost = true;
-    this.soundPlayer.play("enemydamage");
-
+    this.repeatSound = true;
+    /*
     setTimeout(()=>
     {
-      this.x  = 32;
-      this.y = 76;
+
       setTimeout(()=>{
         this.lost = false;
         this.soundPlayer.play("appear");
       }, 200);
     }, 700);
+    */
+  },
+
+  setPosition:function(x, y){
+    this.x = x;
+    this.y = y;
+  }, 
+
+  reveal:function(){
+    this.lost = false;
+    this.appear = true;
+    this.repeatSound = true;
+    this.soundMaking = "appear";
+    setTimeout(()=>{this.appear = false}, 400);
   },
 
   updatePosition:function(gravity, friction) {
-    if (this.lost) {
+    if (this.lost || this.appear) {
       this.velocity_x = 0;
       this.velocity_y = 0;
       return;      
@@ -154,6 +181,7 @@ Player.prototype = {
 
 
 };
+
 Object.assign(Player.prototype, MovingObject.prototype);
 Object.assign(Player.prototype, Animator.prototype);
 Player.prototype.constructor = Player;

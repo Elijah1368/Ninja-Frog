@@ -3,25 +3,13 @@ import Display from "./Display.js";
 import Controller from "./Controller.js";
 import Engine from "./Engine.js";
 import SoundPlayer from "./SoundPlayer.js";
+import ViewPort from "./Viewport.js";
 
-/*
-Load the files before starting the game
-*/
 window.addEventListener("load", function(event) {
 
   "use strict";
-  //Json file of the game
   const ZONE_PREFIX = "Source/zone";
   const ZONE_SUFFIX = ".json";
-
-      /////////////////
-    //// CLASSES ////
-  /////////////////
-
-
-  /*
-  Is in charged of loading game assets 
-  */
   const AssetsManager = function() {
 
     this.tile_set_image = undefined;
@@ -37,23 +25,19 @@ window.addEventListener("load", function(event) {
 
     requestJSON:function(url, callback) {
       
-      //XMLHttpRequest is a request when trying to transfer files
       let request = new XMLHttpRequest();
-
-      //Will wait until files are loaded
       request.addEventListener("load", function(event) {
         
         callback(JSON.parse(this.responseText));
 
       }, { once:true });
 
-      //Get method url
       request.open("GET", url);
       request.send();
 
     },
 
-    //same as top but loads image
+  
     requestImage:function(url, callback) {
 
       let image = new Image();
@@ -78,44 +62,42 @@ window.addEventListener("load", function(event) {
 
       let soundPlayer = new SoundPlayer(audioFiles);
       soundPlayer.adjustSpeed("walk", 2.5);
-      soundPlayer.adjustSpeed("music", 1.3);
-      soundPlayer.adjustVolume("music", .8);
+      soundPlayer.adjustVolume("walk", .8);
+      soundPlayer.adjustSpeed("music", 1.2);
+      soundPlayer.adjustVolume("music", .7);
       soundPlayer.adjustVolume("jump", .8);
       return soundPlayer;
     }
 
   };
 
-      ///////////////////
-    //// FUNCTIONS ////
-  ///////////////////
-  
-  //calls the controller keydownup and passes in event type and code
+
+
   var keyDownUp = function(event) {
 
     controller.keyDownUp(event.type, event.keyCode);
 
   };
 
-  //jsut resizes the canvas to fit world
+
   var resize = function(event) {
 
     display.resize(document.documentElement.clientWidth, document.documentElement.clientHeight, world.height / world.width);
     display.render();
-
     var rectangle = display.context.canvas.getBoundingClientRect();
 
   };
 
-  //very important as it is part of the engine
+ 
   var render = function() {
 
 
     var frame = undefined;
     
+    
     display.drawMap   (assets_manager.tile_set_image,
     world.tile_set.columns, world.graphical_map, world.columns,  world.tile_set.tile_size);
-     
+
     for (let i = 0; i < world.saws.length; i++) {
 
       let saw = world.saws[i];
@@ -127,22 +109,14 @@ window.addEventListener("load", function(event) {
       saw.y, frame.width, frame.height);
 
     }
-
-       /*
-    for (let index = game.world.carrots.length - 1; index > -1; -- index) {
-
-      let carrot = game.world.carrots[index];
-
-      frame = game.world.tile_set.frames[carrot.frame_value];
-
-      display.drawObject(assets_manager.tile_set_image,
+    
+    let trophy = world.trophy;
+    frame = world.tile_set.frames[trophy.frame_value];
+    display.drawObject(assets_manager.tile_set_image,
       frame.x, frame.y,
-      carrot.x + Math.floor(carrot.width * 0.5 - frame.width * 0.5) + frame.offset_x,
-      carrot.y + frame.offset_y, frame.width, frame.height);
-
-    }
-
-    */
+      trophy.x,
+      trophy.y, frame.width, frame.height);
+  
     frame = world.tile_set.frames[world.player.frame_value];
 
     display.drawObject(assets_manager.tile_set_image,
@@ -169,16 +143,20 @@ window.addEventListener("load", function(event) {
 
     world.update();
 
-    if (world.door) {
+    viewport.setCenterX(world.player.x);
+    viewport.setCenterY(world.player.y);
+
+    soundPlayer.play(world.player.soundMaking);
+
+    if (world.trophy.activate) {
 
       engine.stop();
+      display.reset();
 
-      assets_manager.requestJSON(ZONE_PREFIX + world.door.destination_zone + ZONE_SUFFIX, (zone) => {
-
+      assets_manager.requestJSON(ZONE_PREFIX + world.trophy.nextZone + ZONE_SUFFIX, (zone) => {
         world.setup(zone);
-
+        viewport.setBoundaries(world.width, world.height);
         engine.start();
-
       });
 
       return;
@@ -187,20 +165,14 @@ window.addEventListener("load", function(event) {
 
   };
 
-      /////////////////
-    //// OBJECTS ////
-  /////////////////
 
   var assets_manager = new AssetsManager();
   var soundPlayer = assets_manager.loadAudioFiles();
   var controller     = new Controller();
-  var display        = new Display(document.querySelector("canvas"));
-  var world         = new World(soundPlayer);
+  var world         = new World();
+  var viewport = new ViewPort(world.player.x, world.player.y, world.columns * world.tile_set.tile_size, world.rows * world.tile_set.tile_size);
+  var display        = new Display(document.querySelector("canvas"), viewport);
   var engine         = new Engine(1000/30, render, update);
-
-      ////////////////////
-    //// INITIALIZE ////
-  ////////////////////
 
   display.buffer.canvas.height = world.height;
   display.buffer.canvas.width  = world.width;
@@ -213,10 +185,9 @@ window.addEventListener("load", function(event) {
   assets_manager.requestJSON(ZONE_PREFIX + world.zone_id + ZONE_SUFFIX, (zone) => {
 
     world.setup(zone);
-    assets_manager.requestImage("./Assets/SpriteSheet2.png", (image) => {
+    assets_manager.requestImage("./Assets/SpriteSheet.png", (image) => {
 
       assets_manager.tile_set_image = image;
-
       resize();
       engine.start();
 

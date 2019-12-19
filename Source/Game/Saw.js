@@ -3,7 +3,7 @@ import Animator from "./Animator.js";
 
 const Saw = function(x, y) {
 
-  Matter.call(this, x, y, 7, 14);
+  Matter.call(this, x, y, 32, 32);
   Animator.call(this, Saw.prototype.frame_sets["run"], 1);
 
   this.frame_index = Math.floor(Math.random() * 8);
