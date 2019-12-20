@@ -32,10 +32,9 @@ Player.prototype = {
     "double-jump-left": [54, 55, 56, 57, 58, 59],
     "wall-climbing-right": [60, 61, 62, 63, 64],
     "wall-climbing-left": [65, 66, 67, 68, 69],
-    "lose-right": [78, 79, 80, 81, 82, 83, 84, 78, 79,  99, 100, 101, 102, 103, 107],
-    "lose-left": [90, 91, 85, 86, 87, 88, 89, 90, 91, 99, 100, 101, 102, 103, 107],
-    "appear":     [92, 93, 94, 95, 96, 97, 98]
-
+    "lose-right": [78, 79, 80, 81, 82, 83, 84, 78, 79,  99, 100, 101, 102, 103, 106],
+    "lose-left": [90, 91, 85, 86, 87, 88, 89, 90, 91, 99, 100, 101, 102, 103, 106],
+    "appear":     [92, 93, 94, 95, 96, 97, 98],
   },
 
   jump: function() {
@@ -69,7 +68,7 @@ Player.prototype = {
       this.soundMaking = "enemydamage";
       this.repeatSound = false;
     } else if (this.appear && this.repeatSound == true) {
-      this.soundMaking = "appear";
+      this.soundMaking = "coin";
       this.repeatSound = false;
     } else  {
       this.soundMaking = "none";

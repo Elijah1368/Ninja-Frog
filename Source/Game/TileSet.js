@@ -3,12 +3,13 @@ const TileSet = function(columns, tile_size) {
 
   this.columns    = columns;
   this.tile_size  = tile_size;
+  let offset = -7;
 
   let f = Frame;
 
   this.frames = [];
+
   //idle left
-  let offset = -7;
   for (let i = 1; i <= 11; i++){
     this.frames.push(new f(32 * i, 64, 32, 32, 0, offset));
   } 
@@ -42,6 +43,7 @@ const TileSet = function(columns, tile_size) {
   for (let i = 1; i <= 5; i++){
     this.frames.push(new f(32 * i, 32 * 5, 32, 32, 0, offset));
   } 
+
   //wallclimbleft
   for (let i = 1; i <= 5; i++){
     this.frames.push(new f(32 * i + 160, 32 * 5, 32, 32, 0, offset));
@@ -71,12 +73,18 @@ const TileSet = function(columns, tile_size) {
     this.frames.push(new f(32 * i + 224, 32 * 9, 32, 32, 0, offset));
   } 
 
-  //trophy
-  this.frames.push(new f(352, 32 * 5, 64, 64, 0, offset));
-  
   //literally nothiung
   this.frames.push(new f(96, 32 * 6, 32, 32, 0, 0));
 
+  //melon
+  for (let i = 1; i <= 17; i++){
+    this.frames.push(new f(32 * i, 32 * 16 , 32, 32, 0, offset));
+  } 
+
+  //BigSaw
+  for (let i = 0; i < 8; i++){
+    this.frames.push(new f(64 * i + 32, 448, 64, 64, 0, offset));
+  } 
 };
 TileSet.prototype = { constructor: TileSet };
 export default TileSet;

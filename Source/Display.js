@@ -49,7 +49,7 @@ const Display = function(canvas, viewPort) {
       this.context.canvas.width  = height / height_width_ratio;
 
     }
-
+  
     this.context.imageSmoothingEnabled = false;
 
   };

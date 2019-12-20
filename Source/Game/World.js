@@ -3,20 +3,20 @@ import Collider from "./Collider.js";
 import Player from "./Player.js";
 import TileSet from "./TileSet.js";
 import Saw from "./Saw.js";
-import Trophy from "./Trophy.js";
-
+import Melon from "./Melon.js";
+import BigSaw from "./BigSaw.js";
 
 const World = function(friction = 0.85, gravity = 1.5) {
   this.collider     = new Collider();
   this.friction     = friction;
   this.gravity      = gravity;
   this.columns = 40;
-  this.rows = 30;
+  this.rows =30;
   this.tile_set     = new TileSet(19, 32);
-  this.player       = new Player(32, 76);
-  this.zone_id      = "2";
+  this.player       = new Player();
+  this.zone_id      = "1";
   this.saws     = [];
-  this.trophy;
+  this.melon;
   this.height       = this.tile_set.tile_size * this.rows;
   this.width        = this.tile_set.tile_size * this.columns;
 };
@@ -60,33 +60,39 @@ World.prototype = {
   },
 
   setup:function(zone) {
+    //playerdefault : 21
+    //melon default : 306
     this.columns = zone.columns;
     this.rows = zone.rows;
     this.width = this.columns * this.tile_set.tile_size;
     this.height = this.rows * this.tile_set.tile_size;
     let saw = [];
     this.saws = [];
-    this.player.setPosition(zone.playerStartX, zone.playerStartY);
-    zone.objects.map((elem, i) => {
-      if (elem == 142) { 
-        saw.push(i)
-      } else if (elem == 366) {
-        this.trophy = new Trophy((i % this.columns) * this.tile_set.tile_size, (Math.ceil(i  / this.columns) - 2) * this.tile_set.tile_size, zone.nextZone);
-      }
-    });
 
+    zone.objects.map((elem, i) => {
+      switch (elem){
+        case 142:
+          this.saws.push(new Saw((i % this.columns) * this.tile_set.tile_size, (Math.ceil(i  / this.columns) - 1) * this.tile_set.tile_size));
+          break;
+        case 268:
+          this.saws.push(new BigSaw((i % this.columns) * this.tile_set.tile_size, (Math.ceil(i  / this.columns) - 1) * this.tile_set.tile_size));
+          break;
+        case 306:
+          this.melon = new Melon((i % this.columns) * this.tile_set.tile_size, (Math.ceil(i  / this.columns) - 2) * this.tile_set.tile_size, zone.nextZone);
+          break;
+        case 21:
+          this.defaultX = (i % this.columns) * this.tile_set.tile_size;
+          this.defaultY = (Math.ceil(i  / this.columns) - 2) * this.tile_set.tile_size;
+          break;
+       }
+    });
+    this.player.setPosition(this.defaultX, this.defaultY);
     this.collision_map      = zone.map;
     this.graphical_map      = zone.map;
     this.columns            = zone.columns;
     this.rows               = zone.rows;
     this.zone_id            = zone.id;
     
-  
-    for (let i = 0; i < saw.length; i++){
-      let index = saw[i];
-      this.saws.push(new Saw((index % this.columns) * this.tile_set.tile_size, (Math.ceil(index  / this.columns) - 1) * this.tile_set.tile_size));
-    }
-
     },
 
   update:function() {
@@ -104,16 +110,18 @@ World.prototype = {
       
         setTimeout(
           ()=>{
-            this.player.setPosition(32, 76)
+            this.player.setPosition(this.defaultX, this.defaultY)
             this.player.reveal();
           }, 1200);
       }
 
     }
+
     this.updatePlayer(playerCollided);
-    if (this.trophy.collideObject(this.player)){
-      this.trophy.activate = true;
-      this.trophy.soundMaking = "win";
+
+    this.melon.animate();
+    if (this.melon.collideObject(this.player)){
+      this.melon.activate = true;
     }
   },
 

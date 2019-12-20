@@ -8,14 +8,14 @@ import ViewPort from "./Viewport.js";
 window.addEventListener("load", function(event) {
 
   "use strict";
-  const ZONE_PREFIX = "Source/zone";
+  const ZONE_PREFIX = "Zones/zone";
   const ZONE_SUFFIX = ".json";
   const AssetsManager = function() {
 
     this.tile_set_image = undefined;
     this.audio_urls = ["Assets/Sound/Music.mp3", "Assets/Sound/EnemyDamage.mp3", "Assets/Sound/Walk.mp3",
                 "Assets/Sound/Jump.mp3", "Assets/Sound/Lose.mp3", "Assets/Sound/Win.mp3", 
-                "Assets/Sound/PlayerDamage.mp3", "Assets/Sound/Appear.mp3"];
+                "Assets/Sound/PlayerDamage.mp3", "Assets/Sound/Coin.mp3"];
   };
 
   AssetsManager.prototype = {
@@ -64,7 +64,7 @@ window.addEventListener("load", function(event) {
       soundPlayer.adjustSpeed("walk", 2.5);
       soundPlayer.adjustVolume("walk", .8);
       soundPlayer.adjustSpeed("music", 1.2);
-      soundPlayer.adjustVolume("music", .7);
+      soundPlayer.adjustVolume("music", .8);
       soundPlayer.adjustVolume("jump", .8);
       return soundPlayer;
     }
@@ -82,7 +82,7 @@ window.addEventListener("load", function(event) {
 
   var resize = function(event) {
 
-    display.resize(document.documentElement.clientWidth, document.documentElement.clientHeight, world.height / world.width);
+    display.resize(document.documentElement.clientWidth, document.documentElement.clientHeight, viewport.height / viewport.width);
     display.render();
     var rectangle = display.context.canvas.getBoundingClientRect();
 
@@ -104,18 +104,18 @@ window.addEventListener("load", function(event) {
       frame = world.tile_set.frames[saw.frame_value];
 
       display.drawObject(assets_manager.tile_set_image,
-      frame.x, frame.y,
-      saw.x,
-      saw.y, frame.width, frame.height);
+        frame.x, frame.y,
+        saw.x,
+        saw.y, frame.width, frame.height);
 
     }
     
-    let trophy = world.trophy;
-    frame = world.tile_set.frames[trophy.frame_value];
+    let melon = world.melon;
+    frame = world.tile_set.frames[melon.frame_value];
     display.drawObject(assets_manager.tile_set_image,
       frame.x, frame.y,
-      trophy.x,
-      trophy.y, frame.width, frame.height);
+      melon.x,
+      melon.y, frame.width, frame.height);
   
     frame = world.tile_set.frames[world.player.frame_value];
 
@@ -131,12 +131,15 @@ window.addEventListener("load", function(event) {
   var update = function() {
 
     if (controller.left.active ) { 
+      soundPlayer.play("music");
       world.player.moveLeft ();
     }
-    if (controller.right.active) { 
+    if (controller.right.active) {
+      soundPlayer.play("music"); 
       world.player.moveRight();
     }
     if (controller.up.active) { 
+      soundPlayer.play("music");
       world.player.jump();
       controller.up.active = false;
     }
@@ -148,14 +151,17 @@ window.addEventListener("load", function(event) {
 
     soundPlayer.play(world.player.soundMaking);
 
-    if (world.trophy.activate) {
-
+    if (world.melon.activate) {
+      soundPlayer.play("win");
       engine.stop();
       display.reset();
 
-      assets_manager.requestJSON(ZONE_PREFIX + world.trophy.nextZone + ZONE_SUFFIX, (zone) => {
+      assets_manager.requestJSON(ZONE_PREFIX + world.melon.nextZone + ZONE_SUFFIX, (zone) => {
         world.setup(zone);
-        viewport.setBoundaries(world.width, world.height);
+            
+        display.buffer.canvas.height = world.height;
+        display.buffer.canvas.width  = world.width;
+        viewport.setup(world.player.x, world.player.y, world.width, world.height);
         engine.start();
       });
 
@@ -174,18 +180,15 @@ window.addEventListener("load", function(event) {
   var display        = new Display(document.querySelector("canvas"), viewport);
   var engine         = new Engine(1000/30, render, update);
 
-  display.buffer.canvas.height = world.height;
-  display.buffer.canvas.width  = world.width;
-  display.buffer.imageSmoothingEnabled = false;
-
-
-
-  
-
   assets_manager.requestJSON(ZONE_PREFIX + world.zone_id + ZONE_SUFFIX, (zone) => {
 
     world.setup(zone);
-    assets_manager.requestImage("./Assets/SpriteSheet.png", (image) => {
+    
+  display.buffer.canvas.height = world.height;
+  display.buffer.canvas.width  = world.width;
+  display.buffer.imageSmoothingEnabled = false;
+  viewport.setup(world.player.x, world.player.y, world.width, world.height);
+    assets_manager.requestImage("./Assets/SpriteSheet3.png", (image) => {
 
       assets_manager.tile_set_image = image;
       resize();

@@ -67,6 +67,12 @@ Viewport.prototype = {
             this.height = this.defaultHeight;
         }
         
+    },
+
+    setup:function(x, y, rightBoundary, bottomBoundary){
+        this.x = x;
+        this.y = y;
+        this.setBoundaries(rightBoundary, bottomBoundary);
     }
 }
 export default Viewport;
