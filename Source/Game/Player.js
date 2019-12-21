@@ -59,7 +59,7 @@ Player.prototype = {
   },
 
   updateSound:function(){
-    if (this.velocity_y < -10){
+    if (this.velocity_y < -13){
       this.soundMaking = "jump";
     } else if (this.isGrounded && (this.velocity_x > 2 || this.velocity_x < -2)) {
       this.soundMaking = "walk";
