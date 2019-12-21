@@ -3,7 +3,7 @@ import Animator from "./Animator.js";
 
 const BigSaw = function(x, y) {
 
-  Matter.call(this, x, y, 64, 64);
+  Matter.call(this, x, y, 55, 55);
   Animator.call(this, BigSaw.prototype.frame_sets["run"], 1);
 
   this.frame_index = Math.floor(Math.random() * 8);

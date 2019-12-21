@@ -6,7 +6,7 @@ import Saw from "./Saw.js";
 import Melon from "./Melon.js";
 import BigSaw from "./BigSaw.js";
 
-const World = function(friction = 0.85, gravity = 1.5) {
+const World = function(friction = 0.85, gravity = 1.2) {
   this.collider     = new Collider();
   this.friction     = friction;
   this.gravity      = gravity;
@@ -14,7 +14,7 @@ const World = function(friction = 0.85, gravity = 1.5) {
   this.rows =30;
   this.tile_set     = new TileSet(19, 32);
   this.player       = new Player();
-  this.zone_id      = "4";
+  this.zone_id      = "1";
   this.saws     = [];
   this.melon;
   this.height       = this.tile_set.tile_size * this.rows;
@@ -74,7 +74,7 @@ World.prototype = {
     zone.objects.map((elem, i) => {
       switch (elem){
         case 142:
-          this.saws.push(new Saw((i % this.columns) * this.tile_set.tile_size, (Math.ceil(i  / this.columns) - 1) * this.tile_set.tile_size));
+          this.saws.push(new Saw((i % this.columns) * this.tile_set.tile_size, (Math.ceil((i  / this.columns) + .1) - 1) * this.tile_set.tile_size));
           break;
         case 268:
           this.saws.push(new BigSaw((i % this.columns) * this.tile_set.tile_size, (Math.ceil((i  / this.columns)+ .1) - 1) * this.tile_set.tile_size));

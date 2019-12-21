@@ -13,7 +13,6 @@ const Player = function(x, y) {
   this.velocity_x  = 0;
   this.velocity_y  = 0;
   this.old_velocity = 0;
-  this.jumpVelocity = -20;
   this.wallClimbing = false;
   this.isGrounded = true;
   this.lost = false;
@@ -40,31 +39,29 @@ Player.prototype = {
 
   jump: function() {
 
-    /* Made it so you can only jump if you aren't falling faster than 10px per frame. */
     if (this.jumpCount < 2) {
-      this.jumpVelocity = -20;
       this.jumpCount++;
-      this.velocity_y = -20;
+      this.velocity_y = -15;
       if (this.wallClimbing) {
-        this.velocity_x = -1 * this.direction_x * 20;
+        this.velocity_x = -1 * this.direction_x * 15;
       }
     } 
   },
 
   moveLeft: function() {
     this.direction_x = -1;
-    this.velocity_x -= 3;
+    this.velocity_x -= 2.5;
   },
 
   moveRight:function(frame_set) {
     this.direction_x = 1;
-    this.velocity_x += 3;
+    this.velocity_x += 2.5;
   },
 
   updateSound:function(){
-    if (this.velocity_y < -15){
+    if (this.velocity_y < -10){
       this.soundMaking = "jump";
-    } else if (this.isGrounded && (this.velocity_x > 3 || this.velocity_x < -3)) {
+    } else if (this.isGrounded && (this.velocity_x > 2 || this.velocity_x < -2)) {
       this.soundMaking = "walk";
     } else if (this.lost && this.repeatSound == true){
       this.soundMaking = "enemydamage";
