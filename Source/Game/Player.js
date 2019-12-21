@@ -13,6 +13,7 @@ const Player = function(x, y) {
   this.velocity_x  = 0;
   this.velocity_y  = 0;
   this.old_velocity = 0;
+  this.jumpVelocity = -20;
   this.wallClimbing = false;
   this.isGrounded = true;
   this.lost = false;
@@ -41,7 +42,8 @@ Player.prototype = {
 
     /* Made it so you can only jump if you aren't falling faster than 10px per frame. */
     if (this.jumpCount < 2) {
-      this.jumpCount++
+      this.jumpVelocity = -20;
+      this.jumpCount++;
       this.velocity_y = -20;
       if (this.wallClimbing) {
         this.velocity_x = -1 * this.direction_x * 20;
@@ -98,9 +100,9 @@ Player.prototype = {
     } else if (this.lost){
 
       if (this.direction_x < 0) {
-        this.changeFrameSet(this.frame_sets["lose-left"], 2, 0, "playOnce")
+        this.changeFrameSet(this.frame_sets["lose-left"], 1.5, 0, "playOnce")
       } else {
-        this.changeFrameSet(this.frame_sets["lose-right"], 2, 0, "playOnce")
+        this.changeFrameSet(this.frame_sets["lose-right"], 1.5, 0, "playOnce")
       }
     } else if (this.appear) {
       this.changeFrameSet(this.frame_sets["appear"], 2,  0,"playOnce");

@@ -14,7 +14,7 @@ const World = function(friction = 0.85, gravity = 1.5) {
   this.rows =30;
   this.tile_set     = new TileSet(19, 32);
   this.player       = new Player();
-  this.zone_id      = "1";
+  this.zone_id      = "4";
   this.saws     = [];
   this.melon;
   this.height       = this.tile_set.tile_size * this.rows;
@@ -27,9 +27,11 @@ World.prototype = {
 
   collideObject:function(object) {
 
-    /* I got rid of the world boundary collision. Now it's up to the tiles to keep
-    the player from falling out of the world. */
-
+    
+    if      (object.getLeft()   < -32           && this.player.lost == false) {this.playerLost();}
+    else if (object.getRight()  > this.width + 32 && this.player.lost == false) {this.playerLost();}
+    if      (object.getTop()    < -128           && this.player.lost == false) {this.playerLost();}
+    else if (object.getBottom() > this.height + 64 && this.player.lost == false) {this.playerLost();}
     var bottom, left, right, top, value;
     let playerCollided = {
       "left": false,
@@ -75,10 +77,10 @@ World.prototype = {
           this.saws.push(new Saw((i % this.columns) * this.tile_set.tile_size, (Math.ceil(i  / this.columns) - 1) * this.tile_set.tile_size));
           break;
         case 268:
-          this.saws.push(new BigSaw((i % this.columns) * this.tile_set.tile_size, (Math.ceil(i  / this.columns) - 1) * this.tile_set.tile_size));
+          this.saws.push(new BigSaw((i % this.columns) * this.tile_set.tile_size, (Math.ceil((i  / this.columns)+ .1) - 1) * this.tile_set.tile_size));
           break;
         case 306:
-          this.melon = new Melon((i % this.columns) * this.tile_set.tile_size, (Math.ceil(i  / this.columns) - 2) * this.tile_set.tile_size, zone.nextZone);
+          this.melon = new Melon((i % this.columns) * this.tile_set.tile_size, (Math.ceil(i  / this.columns) - 1) * this.tile_set.tile_size, zone.nextZone);
           break;
         case 21:
           this.defaultX = (i % this.columns) * this.tile_set.tile_size;
@@ -106,13 +108,7 @@ World.prototype = {
       saw.animate();
 
       if (saw.collideObject(this.player) && this.player.lost == false) {
-        this.player.lose();
-      
-        setTimeout(
-          ()=>{
-            this.player.setPosition(this.defaultX, this.defaultY)
-            this.player.reveal();
-          }, 1200);
+        this.playerLost();
       }
 
     }
@@ -123,6 +119,15 @@ World.prototype = {
     if (this.melon.collideObject(this.player)){
       this.melon.activate = true;
     }
+  },
+  playerLost:function(){
+    this.player.lose();
+      
+    setTimeout(
+      ()=>{
+        this.player.setPosition(this.defaultX, this.defaultY)
+        this.player.reveal();
+      }, 800);
   },
 
   updatePlayer:function({left: collidedLeft, top: collidedTop, right: collidedRight, bottom: collidedBottom}){

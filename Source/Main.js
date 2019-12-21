@@ -66,6 +66,7 @@ window.addEventListener("load", function(event) {
       soundPlayer.adjustSpeed("music", 1.2);
       soundPlayer.adjustVolume("music", .8);
       soundPlayer.adjustVolume("jump", .8);
+      soundPlayer.adjustSpeed("enemydamage", 1.3);
       return soundPlayer;
     }
 
@@ -158,7 +159,6 @@ window.addEventListener("load", function(event) {
 
       assets_manager.requestJSON(ZONE_PREFIX + world.melon.nextZone + ZONE_SUFFIX, (zone) => {
         world.setup(zone);
-            
         display.buffer.canvas.height = world.height;
         display.buffer.canvas.width  = world.width;
         viewport.setup(world.player.x, world.player.y, world.width, world.height);
@@ -176,7 +176,7 @@ window.addEventListener("load", function(event) {
   var soundPlayer = assets_manager.loadAudioFiles();
   var controller     = new Controller();
   var world         = new World();
-  var viewport = new ViewPort(world.player.x, world.player.y, world.columns * world.tile_set.tile_size, world.rows * world.tile_set.tile_size);
+  var viewport = new ViewPort();
   var display        = new Display(document.querySelector("canvas"), viewport);
   var engine         = new Engine(1000/30, render, update);
 
