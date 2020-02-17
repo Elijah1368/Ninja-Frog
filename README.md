@@ -15,7 +15,7 @@ losing him in the Vietnam war (I think they eat frogs there).
 Try It
 ---
 <a href="https://elijah1368.github.io/The-Office-Quotes">
-    <img src="NinjaFrog2.PNG" width="60%" height="60%" />
+    <img src="NinjaFrog3.PNG" width="60%" height="60%" />
 </a>
 
 
