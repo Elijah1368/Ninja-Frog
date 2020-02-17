@@ -1,8 +1,5 @@
 Ninja Frog 
 ---
-You are a ninja from a great line of shinobi amphibians. Your mission is to
-get all the dragon watermelons so you can bring back your father back to life after
-losing him in the Vietnam war (I think they eat frogs there).
 
 <a href="https://elijah1368.github.io/The-Office-Quotes">
     <img src="NinjaFrog.PNG" width="60%" height="60%" />
@@ -11,6 +8,9 @@ losing him in the Vietnam war (I think they eat frogs there).
     <img src="NinjaFrog2.PNG" width="60%" height="60%" />
 </a>
 
+You are a ninja from a great line of shinobi amphibians. Your mission is to
+get all the dragon watermelons so you can bring back your father back to life after
+losing him in the Vietnam war (I think they eat frogs there).
 
 Try It
 ---
