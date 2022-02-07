@@ -1,6 +1,8 @@
 Ninja Frog 
 ---
 
+Made with pure javascript.
+
 <a href="https://elijah1368.github.io/Ninja-Frog/">
     <img src="NinjaFrog.PNG" width="60%" height="60%" />
 </a>
@@ -10,7 +12,7 @@ Ninja Frog
 
 You are a ninja from a great line of shinobi amphibians. Your mission is to
 get all the dragon watermelons so you can bring back your father back to life after
-losing him in the Vietnam war (I think they eat frogs there).
+losing him in nam.
 
 Try It
 ---
