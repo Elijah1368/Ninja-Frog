@@ -14,6 +14,8 @@ losing him in the Vietnam war (I think they eat frogs there).
 
 Try It
 ---
+
+CLICK HERE:
 <a href="https://elijah1368.github.io/Ninja-Frog/">
     <img src="NinjaFrog3.PNG" width="60%" height="60%" />
 </a>
