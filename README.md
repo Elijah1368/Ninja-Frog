@@ -4,6 +4,9 @@ Ninja Frog
 
 Click on the image to play the game!!
 
+
+Use Left and Right Arrow keys to run left and right. Use up arrow to jump. You can press up arrow while in mid air to double jump! You can also cling on walls by colliding on it while midair and then you can wall jump by pressing up arrow again! 
+
 <a href="https://elijah1368.github.io/Ninja-Frog/">
     <img src="NinjaFrog.PNG" width="60%" height="60%" />
 </a>
