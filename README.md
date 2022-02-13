@@ -1,7 +1,8 @@
 Ninja Frog 
 ---
 
-Made with pure javascript.
+
+Click on the image to play the game!!
 
 <a href="https://elijah1368.github.io/Ninja-Frog/">
     <img src="NinjaFrog.PNG" width="60%" height="60%" />
