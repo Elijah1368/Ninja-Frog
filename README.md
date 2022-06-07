@@ -34,6 +34,6 @@ go to index.html and run it with live server
 
 Credits
 ---
-PothOnProgramming for World Physics: https://www.youtube.com/channel/UCdS3ojA8RL8t1r18Gj1cl6w
+
 Pixel Frog for Sprite: https://pixel-frog.itch.io/pixel-adventure-1
 freesound.org for music and sound effects: https://freesound.org/
